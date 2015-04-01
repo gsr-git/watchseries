@@ -10,7 +10,6 @@ import pickle
 
 
 series_db = {}
-seasons_db = {}
 names = []
 master_url = "http://watchseriestv.to"
 
@@ -127,8 +126,10 @@ def create_db(url, xpath_seasons, xpath_names, xpath_links, xpath_season_urls, l
         selected_key = menu("Title", "Body", names) #do not pass keys of series_db as they are sorted; pass names
         cmd = handle_cmd(selected_key)
         
-        if cmd == 'b':
+        if cmd == 'b' and listing=="seasons":
             episode_selected = 0
+        elif cmd == 'b':
+            return cmd
         else:
             episode_selected = 1
 
