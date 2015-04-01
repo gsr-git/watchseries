@@ -16,10 +16,11 @@ not host any content on its servers or network.
 
 use the following command to run the application
 
-*python watchseries.py -[e|s] -[d]*
-  -e : Directly lists all episodes of the series selected
-  -s : Lists the seasons of the series first and then the episodes
-  -d : Download mode
+*python watchseries.py -[e|s] -[d]*  
+  
+  -e : Directly lists all episodes of the series selected  
+  -s : Lists the seasons of the series first and then the episodes  
+  -d : Download mode  
             Downloads video to current directory
 
 #ToDo
