@@ -22,14 +22,25 @@ use the following command to run the application
   -d : Download mode
             Downloads video to current directory
 
+Once application starts,
+Use menu item numbers to navigate 
+Use 'q' to quit at any time and 'b' for going back to previous menu
+
 #ToDo
 
+
 - Add checks for non-numeric input
+- Add http headers
+- Add runtime option --help
 - Add checks to ensure user input is within bounds
 - Add try-except to handle "too many requests error"
+- Add settings menuoption at the beginning and stre settings in program separately
 - Add option to change download directory
 - Change Structure(add classes) of code ; separate out watchseries and plugins (gorilavid etc.)
 - Use local storage to limit repeated accesses to the site
 - Add option to add favourites which will be listed on the first page in addition to search
- 
-
+- Maintain history of shows and list that on the main page
+- (optional) maintain frequently visited shows' names
+- Comma separated input to queue items (as playlist in vlc or for download or in new tabs in chrome)
+- (finally) make a Tkinter interface with thumbnail
+- Add description of shows

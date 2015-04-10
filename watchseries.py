@@ -1,6 +1,7 @@
-#!/bin/bash/python
+#!/usr/bin/env python
 
 import requests
+from urllib import quote
 import codecs
 import os
 import sys
@@ -8,7 +9,7 @@ from lxml import etree
 import pickle
 
 
-
+#Global Dictionaries
 series_db = {}
 names = []
 master_url = "http://watchseriestv.to"
@@ -167,6 +168,7 @@ def gorillavid(url, str_or_dwn):
     if len(gorillas) == 0:
         quit()
     gorilla_nr = raw_input("Which Link do you want to run ? ")
+    
     response = requests.post(gorillas[int(gorilla_nr) - 1])
     '''
     for i in range(0,len(gorillas)):
@@ -182,10 +184,16 @@ def gorillavid(url, str_or_dwn):
     simple_click = tree.xpath(xpath_simple_click)
     #print simple_click
     
-    #stage 3
+    #stage 2.1 - Play video in browser (embedded)
     id = simple_click[0].split('/')[-1]
-    #id = id1[-1]
-    print id
+    window_size="1280x720"
+    embed_link = "http://gorillavid.in/embed-" + str(id) + "-" + window_size + ".html"
+    if str_or_dwn == 'google-chrome':
+        stream_video(embed_link, str_or_dwn)
+
+    #stage 2.2 - Extract video for streaming using vlc or for download
+
+    #stage 3
     continue_data = {'id' : str(id),
          'method_free' : 'Free Download',
          'op' : 'download1'}
@@ -205,16 +213,15 @@ def gorillavid(url, str_or_dwn):
     print "Woo Hoo !! Got the video link - " + link
     if str_or_dwn == 'download':
         download_video(link)
-    else:
-        stream_video(link)
+    elif str_or_dwn == "vlc":
+        stream_video(link, str_or_dwn)
 
 def download_video(lnk):
     cmd = "wget " + (lnk)
     os.system(cmd)
 
-def stream_video(lnk):
-#    cmd = "cvlc -v " + (lnk)
-    cmd = "vlc " + (lnk)
+def stream_video(lnk, stream_opt):
+    cmd = str(stream_opt) + " " + (lnk)
     os.system(cmd)
 
 
@@ -228,23 +235,24 @@ def welcome():
 
 def search():
     os.system('clear')
-    name = menu("Search", "What's your poison ? ",[])
+    name = menu("Search", "Enter the name of the show : ",[])
     cmd = handle_cmd(name)
 
     os.system('clear')
     #search_string = name.replace(" ","%20")
-    search_string = unicode(name)
+    search_string = quote(name)
+    
     print "Searching for " + name
     print "Please wait ..."
     search_url = master_url + "/search/" + search_string
-
+    print search_url
     response = requests.post(search_url)
     results_data = response.text
     tree = etree.HTML(results_data)
     
     xpath_results = "//div/a/strong/text()"
     xpath_result_links = "//div/div/div/div/a[@target='_blank']/strong/parent::a/@href"
-    results = tree.xpath(xpath_results)
+    results = tree.xpath(xpath_results) 
     result_links = tree.xpath(xpath_result_links)
 
     #menu
@@ -267,25 +275,24 @@ def search():
     
 def main():    
 
-    pages = { '1' : welcome,
-              '2' : search,
-              '3' : create_db,
-              '4' : gorillavid
-              }
     listing = "episodes"
-    str_or_dw = "stream"
+    str_or_dw = "vlc"
     if len(sys.argv)>1:
         if "-s" in sys.argv:
             listing = "seasons"
         
         if "-d" in sys.argv:
             str_or_dw = "download"
+        if "--chrome" in sys.argv:
+            str_or_dw = "google-chrome"
 
     
     xpath_season_nrs = "//div[@itemprop='season']/h2/a/span/text()"
     xpath_season_urls = "//div[@itemprop='season']/h2/a/@href"
     xpath_episodes = "//div[@itemprop='season']/ul/li/a/@href"
     xpath_ep_name = "//div[@itemprop='season']/ul/li/a/span[@itemprop='name']/text()"
+    
+    #welcome()
 
     url='b'
     episode = 'b'
@@ -293,6 +300,7 @@ def main():
         while episode == 'b':
             while url=='b':
                 url = search()
+            print url
             episode = create_db(url,xpath_season_nrs, xpath_ep_name, xpath_episodes, xpath_season_urls, listing)
             if episode == 'b':
                 url = 'b'
